@@ -23,5 +23,5 @@ export class Postagem {
   texto: string;
 
   @UpdateDateColumn()
-  data: Date;
+  data: Date; // Timestamp: Representa um instante único, um ponto específico na linha do tempo, e seu valor corresponde a uma determinada quantidade de tempo decorrida a partir de um instante inicial.
 }
