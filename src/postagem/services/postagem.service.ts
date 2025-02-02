@@ -1,3 +1,4 @@
+import { TemaService } from './../../tema/services/tema.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Postagem } from './../entities/postagem.entity';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
@@ -9,10 +10,16 @@ export class PostagemService {
   constructor(
     @InjectRepository(Postagem) // Indica a classe entity que será utilizada pela injeção de dependência da classe 'Repository'. Sendo assim, 'postagemRepository' (injeção de dependência) está associado à entidade 'Postagem'.
     private postagemRepository: Repository<Postagem>, // Definição do objeto 'postagemRepository' para executar os métodos da classe 'Repository'.
+    private temaService: TemaService, // Injeção de dependência, para ter acesso aos métodos da classe TemaService.
   ) {}
 
   async findAll(): Promise<Postagem[]> {
-    return await this.postagemRepository.find(); // SELECT * FROM tb_postagens;
+    // SELECT * FROM tb_postagens;
+    return await this.postagemRepository.find({
+      relations: {
+        tema: true,
+      },
+    });
   }
 
   async findById(id: number): Promise<Postagem> {
@@ -22,6 +29,9 @@ export class PostagemService {
       // Ou seja, o código só prossegue após o objeto Postagem ser encontrado (ou a Promise ser rejeitada), e o resultado será atribuído à variável postagem.
       where: {
         id,
+      },
+      relations: {
+        tema: true,
       },
     });
 
@@ -39,12 +49,17 @@ export class PostagemService {
         // ILike - Insensitive Like (ignora se a string foi digitada com letras maiúsculas ou minúsculas). Este método converte a string para letras maiúsculas, e depois faz a comparação;
         // Like - Sensitive Like (NÃO ignora se a string está em maiúsculo ou minúsculo, ou seja, ele faz uma busca literal).
       },
+      relations: {
+        tema: true,
+      },
     });
   }
 
   async create(postagem: Postagem): Promise<Postagem> {
     // O parâmetro postagem do método é preenchido com os dados enviados pelo cliente no corpo da requisição HTTP (Request Body)
     // e será encaminhado pela PostagemController para o método create do PostagemService para que a persistência seja executada.
+
+    await this.temaService.findById(postagem.tema.id);
 
     // INSERT INTO tb_postagens (titulo, texto, data) VALUES ("Título", "Texto", CURRENT_TIMESTAMP());
     return await this.postagemRepository.save(postagem);
@@ -56,7 +71,9 @@ export class PostagemService {
 
     await this.findById(postagem.id);
 
-    // UPDATE tb_postagens SET titulo = "titulo", texto = "texto", data = CURRENT_TIMESTAMP() WHERE id = id;
+    await this.temaService.findById(postagem.tema.id);
+
+    // UPDATE tb_postagens SET titulo = postagem.titulo, texto = postagem.texto, data = CURRENT_TIMESTAMP() WHERE id = postagem.id;
     return await this.postagemRepository.save(postagem); // O método save() da classe Repository pode ser usado tanto para persistir um novo objeto quanto para atualizar um objeto existente no banco de dados.
   }
 
