@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from '../../auth/guard/jwt-auth.guard';
 import { Postagem } from '../entities/postagem.entity';
 import { PostagemService } from './../services/postagem.service';
 import {
@@ -11,8 +12,10 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 
+@UseGuards(JwtAuthGuard)
 @Controller('/postagens') // Definir o caminho do recurso Postagem (endpoint)
 export class PostagemController {
   constructor(private readonly postagemService: PostagemService) {} // Construtor criado para receber as Injeções de Dependências necessárias para o funcionamento da classe controladora.
