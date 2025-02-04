@@ -1,3 +1,4 @@
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guard/jwt-auth.guard';
 import { Postagem } from '../entities/postagem.entity';
 import { PostagemService } from './../services/postagem.service';
@@ -15,8 +16,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
+@ApiTags('Postagem')
 @UseGuards(JwtAuthGuard)
 @Controller('/postagens') // Definir o caminho do recurso Postagem (endpoint)
+@ApiBearerAuth()
 export class PostagemController {
   constructor(private readonly postagemService: PostagemService) {} // Construtor criado para receber as Injeções de Dependências necessárias para o funcionamento da classe controladora.
   // Com isso, podemos acessar todos os métodos e funcionalidades da PostagemService dentro da controladora, permitindo que a lógica de negócios (como a recuperação, criação, atualização e exclusão de postagens) seja delegada ao serviço,
@@ -59,7 +62,8 @@ export class PostagemController {
 
   @Delete('/:id')
   @HttpCode(HttpStatus.NO_CONTENT) // NO_CONTENT 🡪 204 (o Objeto não existe, pois foi apagado do BD).
-  delete(@Param('id', ParseIntPipe) id: number) { // A instrução ParseIntPipe converte o valor da variável de caminho id (inicialmente uma string) em um número.
+  delete(@Param('id', ParseIntPipe) id: number) {
+    // A instrução ParseIntPipe converte o valor da variável de caminho id (inicialmente uma string) em um número.
     return this.postagemService.delete(id);
   }
 }

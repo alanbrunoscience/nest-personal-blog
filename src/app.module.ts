@@ -7,6 +7,28 @@ import { Tema } from './tema/entities/tema.entity';
 import { AuthModule } from './auth/auth.module';
 import { Usuario } from './usuario/entities/usuario.entity';
 import { UsuarioModule } from './usuario/usuario.module';
+import { AppController } from './app.controller';
+import { ConfigModule } from '@nestjs/config';
+import { ProdService } from './data/services/prod.service';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRootAsync({
+      useClass: ProdService, // Para executar a aplicação localmente, precisamos alterar esta linha para a Classe DevService.
+      imports: [ConfigModule],
+    }),
+    PostagemModule,
+    TemaModule,
+    AuthModule,
+    UsuarioModule,
+  ],
+  controllers: [AppController],
+  providers: [],
+})
+export class AppModule {}
+
+/* Antes da Implementação do Render
 
 @Module({
   imports: [
@@ -27,7 +49,9 @@ import { UsuarioModule } from './usuario/usuario.module';
     AuthModule,
     UsuarioModule,
   ],
-  controllers: [],
+  controllers: [AppController], // Se a Classe AppController, não for registrada no Módulo principal da aplicação (AppModule), o endpoint do Swagger não ficará disponível.
   providers: [],
 })
 export class AppModule {} // O AppModule é o módulo raiz da aplicação e, ao registrar o PostagemModule (por exemplo), ele disponibiliza as funcionalidades de Postagem para toda a aplicação.
+
+*/

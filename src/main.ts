@@ -3,9 +3,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const config = new DocumentBuilder()
+  .setTitle('Personal Blog')
+  .setDescription('Personal Blog Project')
+  .setContact("Alan Bruno","https://github.com/alanbrunoscience","alanengem@gmail.com")
+  .setVersion('1.0')
+  .addBearerAuth()
+  .build();
+  const document = SwaggerModule.createDocument(app, config); // Aplicação (app) e Swagger (config)
+  SwaggerModule.setup('/swagger', app, document);
 
   process.env.TZ = '-03:00'; // Configurar o fuso horário da aplicação para Time Zone (TZ) -03:00 (horário de Brasília no padrão UTC), já que o Brasil está em UTC -03:00 em relação a Greenwich (UTC 00:00).
 
